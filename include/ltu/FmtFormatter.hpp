@@ -1,9 +1,9 @@
 #ifndef LTU_FMT_FORMATTER
 #define LTU_FMT_FORMATTER
 
-#pragma once
 
 #include <fmt/format.h>
+
 
 namespace ltu {
 template<typename T, class PrintStrategy> struct LftLog;

@@ -1,11 +1,11 @@
 #ifndef LTU_STD_PRINT_STRATEGY
 #define LTU_STD_PRINT_STRATEGY
 
-#pragma once
 
 #include <print>
 #include <utility>
 
+#ifdef __cpp_lib_print
 
 namespace ltu {
 
@@ -32,5 +32,7 @@ protected:
 };// StdPrintStrategy
 
 }// namespace ltu
+
+#endif// __cpp_lib_print
 
 #endif// LTU_STD_PRINT_STRATEGY

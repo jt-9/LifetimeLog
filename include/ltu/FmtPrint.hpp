@@ -1,10 +1,10 @@
 #ifndef LTU_FMT_PRINT_STRATEGY
 #define LTU_FMT_PRINT_STRATEGY
 
-#pragma once
 
 #include <fmt/base.h>
 #include <fmt/format.h>
+#include <fmt/std.h>
 #include <utility>
 
 

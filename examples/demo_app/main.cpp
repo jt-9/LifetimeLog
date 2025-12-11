@@ -1,35 +1,41 @@
 // #include "ltu/FmtFormatter.hpp"
 // #include "ltu/FmtPrint.hpp"
-// #include "ltu/LftLog.hpp"
+#include "ltu/LftLog.hpp"
 
-// #include <print>
-#include <fmt/base.h>
+// NOLINTNEXTLINE
+#include <print>
+// #include <fmt/base.h>
 
 
 int main(/*int argc, char **argv*/) noexcept
 {
   // using PringStrategy = ltu::FmtPrintStrategy;
 
-  fmt::println("------------- LifetimeInfo example app -------------");
+  std::println("------------- LifetimeInfo example app -------------");
 
   constexpr auto wrapped_value = 5.8;
-  fmt::println("wrapped_value = {}", wrapped_value);
+  std::println("wrapped_value = {}", wrapped_value);
 
-  // ltu::LftLog<double, ltu::FmtPrintStrategy> li1{ wrapped_value };
-  // fmt::println("li1 with wrapped_value = {}", li1);
+  std::println("------------------------------");
+  const ltu::LftLog ld1{ wrapped_value };
+  std::println("li1 with wrapped_value = {}", ld1);
 
-  // const auto wrapped_value2 = 42;
-  // const ltu::LftLog<int, ltu::FmtPrintStrategy> li2{ wrapped_value2 };
-  // fmt::println("li2 = {}", li2);
+  std::println("------------------------------");
+  constexpr auto wrapped_value2 = 42;
+  const ltu::LftLog li2{ wrapped_value2 };
+  std::println("li2 = {}", li2);
 
-  // fmt::println("{} + {} = {}", li1, li2, ltu::LftLog{li1 + li2});
+  std::println("------------------------------");
 
-  // ltu::LftLog<void, ltu::FmtPrintStrategy> lv1;
+  // NOLINTBEGIN(cppcoreguidelines-avoid-magic-numbers, readability-magic-numbers)
+  std::println("{} + {} - {} = {}", ld1, li2, ltu::LftLog{ 2.73F }, ltu::LftLog{ ld1 + li2 - static_cast<double>(ltu::LftLog{ 2.73F }) });
+  // NOLINTEND(cppcoreguidelines-avoid-magic-numbers, readability-magic-numbers)
+
+  std::println("------------------------------");
+  const ltu::LftLog<void> lv1;
+  // Shouldn't compile due to static_assert in template specialisation for void in std::formatter<ltu::LftLog<...>>
   //  std::println("{}", lv1);
 
-  // constexpr auto wrapped_value2 = -42;
-  // ltu::LftLog lli1{ ltu::LftLog{ wrapped_value2 } };
-  // fmt::println("LftLog<LftLog> lli = {}", lli1);
 
   return 0;
 }

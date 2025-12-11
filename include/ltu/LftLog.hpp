@@ -1,12 +1,8 @@
 #ifndef LTU_OBJECT_LIFETIME
 #define LTU_OBJECT_LIFETIME
 
-#pragma once
 
-#ifdef __cpp_lib_print
 #include "StdPrint.hpp"
-#endif
-
 #include "StringifyTemplateArgs.hpp"
 
 #include <concepts>
@@ -22,9 +18,9 @@ namespace {
 
   template<typename Ptr>
     requires std::is_pointer_v<Ptr>
-  [[nodiscard]] constexpr void *cast_pointer_to_void(Ptr ptr) noexcept
+  [[nodiscard]] constexpr const void *cast_pointer_to_void(const Ptr ptr) noexcept
   {
-    return static_cast<void *>(ptr);
+    return static_cast<const void *>(ptr);
   }
 }// namespace
 
@@ -159,24 +155,48 @@ struct LftLog : private PrintStrategy
 
   [[nodiscard]] constexpr operator T &() & noexcept
   {
-    PrintStrategy::println("{}::operator T() & l-value cast to T instance {} thread {}\n\twith T = {}",
+    PrintStrategy::println("{}::operator T&() cast operator instance {} thread {}\n\twith T = {}",
       type_to_string(),
       cast_pointer_to_void(this),
       std::this_thread::get_id(),
-      GetTypeName<value_type>()
-      /*std::stacktrace::current(1, 1)*/);
+      GetTypeName<value_type>(),
+      std::stacktrace::current(1, 1));
+
+    return t_;
+  }
+
+  [[nodiscard]] constexpr operator const T &() const & noexcept
+  {
+    PrintStrategy::println("{}::operator const T&() const cast operator instance {} thread {}\n\twith T = {}",
+      type_to_string(),
+      cast_pointer_to_void(this),
+      std::this_thread::get_id(),
+      GetTypeName<value_type>(),
+      std::stacktrace::current(1, 1));
 
     return t_;
   }
 
   [[nodiscard]] constexpr operator T &&() && noexcept
   {
-    PrintStrategy::println("{}::operator T() pr-value cast to T instance {} thread {}\n\twith T = {}",
+    PrintStrategy::println("{}::operator T&&() cast operator instance {} thread {}\n\twith T = {}",
       type_to_string(),
       cast_pointer_to_void(this),
       std::this_thread::get_id(),
-      GetTypeName<value_type>()
-      /*std::stacktrace::current(1, 1)*/);
+      GetTypeName<value_type>(),
+      std::stacktrace::current(1, 1));
+
+    return std::move(t_);
+  }
+
+  [[nodiscard]] constexpr operator const T &&() const && noexcept
+  {
+    PrintStrategy::println("{}::operator const T&&() const cast operator instance {} thread {}\n\twith T = {}",
+      type_to_string(),
+      cast_pointer_to_void(this),
+      std::this_thread::get_id(),
+      GetTypeName<value_type>(),
+      std::stacktrace::current(1, 1));
 
     return std::move(t_);
   }
@@ -264,10 +284,12 @@ private:
   LTU_TYPE_NAME_TO_STRING(LftLog<void>)
 };
 
+}// namespace ltu
+
 #ifdef __cpp_lib_print
 template<class CharT, typename Type, class PrintStrategy>
 // requires(!std::is_void_v<Type>)
-struct std::formatter<LftLog<Type, PrintStrategy>, CharT> : std::formatter<Type, CharT>
+struct std::formatter<ltu::LftLog<Type, PrintStrategy>, CharT> : std::formatter<Type, CharT>
 {
   static_assert(!std::is_void_v<Type>, "Type 'void' is not formattable");
 
@@ -277,7 +299,5 @@ struct std::formatter<LftLog<Type, PrintStrategy>, CharT> : std::formatter<Type,
   }
 };
 #endif
-
-}// namespace ltu
 
 #endif// LTU_OBJECT_LIFETIME
