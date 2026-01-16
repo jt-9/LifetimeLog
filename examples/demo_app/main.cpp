@@ -2,11 +2,10 @@
 // #include "ltu/FmtPrint.hpp"
 #include "ltu/LftLog.hpp"
 
-// NOLINTNEXTLINE
 #include <print>
 // #include <fmt/base.h>
 
-
+// NOLINTNEXTLINE(bugprone-exception-escape)
 int main(/*int argc, char **argv*/) noexcept
 {
   // using PringStrategy = ltu::FmtPrintStrategy;

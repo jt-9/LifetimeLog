@@ -6,7 +6,7 @@
 #include "StringifyTemplateArgs.hpp"
 
 #include <concepts>
-#include <stacktrace>
+//#include <stacktrace>
 #include <string_view>
 #include <thread>
 #include <utility>
@@ -44,7 +44,8 @@ struct LftLog : private PrintStrategy
       cast_pointer_to_void(this),
       std::this_thread::get_id(),
       GetTypeName<value_type>(),
-      std::stacktrace::current(1, 1));
+      ""
+      /*std::stacktrace::current(1, 1)*/);
   }
 
   constexpr LftLog(const LftLog &src) noexcept
@@ -57,7 +58,8 @@ struct LftLog : private PrintStrategy
       cast_pointer_to_void(this),
       std::this_thread::get_id(),
       GetTypeName<value_type>(),
-      std::stacktrace::current(1, 1));
+      ""
+      /*std::stacktrace::current(1, 1)*/);
   }
 
   constexpr LftLog(LftLog &&src) noexcept
@@ -70,7 +72,8 @@ struct LftLog : private PrintStrategy
       cast_pointer_to_void(this),
       std::this_thread::get_id(),
       GetTypeName<value_type>(),
-      std::stacktrace::current(1, 1));
+      ""
+      /*std::stacktrace::current(1, 1)*/);
   }
 
   // template<typename U>
@@ -95,7 +98,8 @@ struct LftLog : private PrintStrategy
       cast_pointer_to_void(this),
       std::this_thread::get_id(),
       GetTypeName<value_type>(),
-      std::stacktrace::current(1, 1));
+      ""
+      /*std::stacktrace::current(1, 1)*/);
   }
 
   explicit constexpr LftLog(T &&t) noexcept
@@ -107,7 +111,8 @@ struct LftLog : private PrintStrategy
       cast_pointer_to_void(this),
       std::this_thread::get_id(),
       GetTypeName<value_type>(),
-      std::stacktrace::current(1, 1));
+      ""
+      /*std::stacktrace::current(1, 1)*/);
   }
 
   constexpr ~LftLog() noexcept
@@ -117,7 +122,8 @@ struct LftLog : private PrintStrategy
       cast_pointer_to_void(this),
       std::this_thread::get_id(),
       GetTypeName<value_type>(),
-      std::stacktrace::current(1, 1));
+      ""
+      /*std::stacktrace::current(1, 1)*/);
   }
 
   constexpr LftLog &operator=(const LftLog &rhs) & noexcept
@@ -132,7 +138,8 @@ struct LftLog : private PrintStrategy
       cast_pointer_to_void(this),
       std::this_thread::get_id(),
       GetTypeName<value_type>(),
-      std::stacktrace::current(1, 1));
+      ""
+      /*std::stacktrace::current(1, 1)*/);
 
     return *this;
   }
@@ -148,7 +155,8 @@ struct LftLog : private PrintStrategy
       cast_pointer_to_void(this),
       std::this_thread::get_id(),
       GetTypeName<value_type>(),
-      std::stacktrace::current(1, 1));
+      ""
+      /*std::stacktrace::current(1, 1)*/);
 
     return *this;
   }
@@ -160,7 +168,8 @@ struct LftLog : private PrintStrategy
       cast_pointer_to_void(this),
       std::this_thread::get_id(),
       GetTypeName<value_type>(),
-      std::stacktrace::current(1, 1));
+      ""
+      /*std::stacktrace::current(1, 1)*/);
 
     return t_;
   }
@@ -172,7 +181,8 @@ struct LftLog : private PrintStrategy
       cast_pointer_to_void(this),
       std::this_thread::get_id(),
       GetTypeName<value_type>(),
-      std::stacktrace::current(1, 1));
+      ""
+      /*std::stacktrace::current(1, 1)*/);
 
     return t_;
   }
@@ -184,7 +194,8 @@ struct LftLog : private PrintStrategy
       cast_pointer_to_void(this),
       std::this_thread::get_id(),
       GetTypeName<value_type>(),
-      std::stacktrace::current(1, 1));
+      ""
+      /*std::stacktrace::current(1, 1)*/);
 
     return std::move(t_);
   }
@@ -196,7 +207,8 @@ struct LftLog : private PrintStrategy
       cast_pointer_to_void(this),
       std::this_thread::get_id(),
       GetTypeName<value_type>(),
-      std::stacktrace::current(1, 1));
+      ""
+      /*std::stacktrace::current(1, 1)*/);
 
     return std::move(t_);
   }
@@ -218,7 +230,8 @@ template<class PrintStrategy> struct LftLog<void, PrintStrategy> : private Print
       cast_pointer_to_void(this),
       std::this_thread::get_id(),
       GetTypeName<value_type>(),
-      std::stacktrace::current(1, 1));
+      ""
+      /*std::stacktrace::current(1, 1)*/);
   }
 
   constexpr LftLog(const LftLog &) noexcept
@@ -229,7 +242,8 @@ template<class PrintStrategy> struct LftLog<void, PrintStrategy> : private Print
       cast_pointer_to_void(this),
       std::this_thread::get_id(),
       GetTypeName<value_type>(),
-      std::stacktrace::current(1, 1));
+      ""
+      /*std::stacktrace::current(1, 1)*/);
   }
 
   constexpr LftLog(LftLog &&) noexcept
@@ -240,7 +254,8 @@ template<class PrintStrategy> struct LftLog<void, PrintStrategy> : private Print
       cast_pointer_to_void(this),
       std::this_thread::get_id(),
       GetTypeName<value_type>(),
-      std::stacktrace::current(1, 1));
+      ""
+      /*std::stacktrace::current(1, 1)*/);
   }
 
   constexpr ~LftLog() noexcept
@@ -250,7 +265,8 @@ template<class PrintStrategy> struct LftLog<void, PrintStrategy> : private Print
       cast_pointer_to_void(this),
       std::this_thread::get_id(),
       GetTypeName<value_type>(),
-      std::stacktrace::current(1, 1));
+      ""
+      /*std::stacktrace::current(1, 1)*/);
   }
 
   constexpr LftLog &operator=(const LftLog &) & noexcept
@@ -262,7 +278,8 @@ template<class PrintStrategy> struct LftLog<void, PrintStrategy> : private Print
       cast_pointer_to_void(this),
       std::this_thread::get_id(),
       GetTypeName<value_type>(),
-      std::stacktrace::current(1, 1));
+      ""
+      /*std::stacktrace::current(1, 1)*/);
 
     return *this;
   }
@@ -275,7 +292,8 @@ template<class PrintStrategy> struct LftLog<void, PrintStrategy> : private Print
       cast_pointer_to_void(this),
       std::this_thread::get_id(),
       GetTypeName<value_type>(),
-      std::stacktrace::current(1, 1));
+      ""
+      /*std::stacktrace::current(1, 1)*/);
 
     return *this;
   }
