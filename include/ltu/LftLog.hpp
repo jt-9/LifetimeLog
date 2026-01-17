@@ -66,8 +66,7 @@ struct LftLog : private PrintStrategy
     requires std::is_move_constructible_v<T>
     : t_{ std::move(src.t_) }
   {
-    PrintStrategy::println("{}({} &&src) move constructor instance {} thread {}\n\twith T = {}\n\tcaller {}",
-      type_to_string(),
+    PrintStrategy::println("{0}({0} &&src) move constructor instance {} thread {}\n\twith T = {}\n\tcaller {}",
       type_to_string(),
       cast_pointer_to_void(this),
       std::this_thread::get_id(),
@@ -132,8 +131,7 @@ struct LftLog : private PrintStrategy
     t_ = rhs.t_;
 
     PrintStrategy::println(
-      "{}::operator=(const {} &rhs) copy assignment instance {} thread {}\n\twith T = {}\n\tcaller {}",
-      type_to_string(),
+      "{0}::operator=(const {0} &rhs) copy assignment instance {} thread {}\n\twith T = {}\n\tcaller {}",
       type_to_string(),
       cast_pointer_to_void(this),
       std::this_thread::get_id(),
@@ -149,8 +147,7 @@ struct LftLog : private PrintStrategy
   {
     t_ = std::move(rhs.t_);
 
-    PrintStrategy::println("{}::operator=({} &&rhs) move assignment instance {} thread {}\n\twith T = {}\n\tcaller {}",
-      type_to_string(),
+    PrintStrategy::println("{0}::operator=({0} &&rhs) move assignment instance {} thread {}\n\twith T = {}\n\tcaller {}",
       type_to_string(),
       cast_pointer_to_void(this),
       std::this_thread::get_id(),
@@ -236,8 +233,7 @@ template<class PrintStrategy> struct LftLog<void, PrintStrategy> : private Print
 
   constexpr LftLog(const LftLog &) noexcept
   {
-    PrintStrategy::println("{}(const {} &src) copy constructor instance {} thread {}\n\twith T = {}\n\tcaller {}",
-      type_to_string(),
+    PrintStrategy::println("{0}(const {0} &src) copy constructor instance {} thread {}\n\twith T = {}\n\tcaller {}",
       type_to_string(),
       cast_pointer_to_void(this),
       std::this_thread::get_id(),
@@ -248,8 +244,7 @@ template<class PrintStrategy> struct LftLog<void, PrintStrategy> : private Print
 
   constexpr LftLog(LftLog &&) noexcept
   {
-    PrintStrategy::println("{}({} &&src) move constructor instance {} thread {}\n\twith T = {}\n\tcaller {}",
-      type_to_string(),
+    PrintStrategy::println("{0}({0} &&src) move constructor instance {} thread {}\n\twith T = {}\n\tcaller {}",
       type_to_string(),
       cast_pointer_to_void(this),
       std::this_thread::get_id(),
@@ -272,8 +267,7 @@ template<class PrintStrategy> struct LftLog<void, PrintStrategy> : private Print
   constexpr LftLog &operator=(const LftLog &) & noexcept
   {
     PrintStrategy::println(
-      "{}::operator=(const {} &rhs) copy assignment instance {} thread {}\n\twith T = {}\n\tcaller {}",
-      type_to_string(),
+      "{0}::operator=(const {0} &rhs) copy assignment instance {} thread {}\n\twith T = {}\n\tcaller {}",
       type_to_string(),
       cast_pointer_to_void(this),
       std::this_thread::get_id(),
@@ -286,8 +280,7 @@ template<class PrintStrategy> struct LftLog<void, PrintStrategy> : private Print
 
   constexpr LftLog &operator=(LftLog &&) noexcept
   {
-    PrintStrategy::println("{}::operator=({} &&rhs) move assignment instance {} thread {}\n\twith T = {}\n\tcaller {}",
-      type_to_string(),
+    PrintStrategy::println("{0}::operator=({0} &&rhs) move assignment instance {} thread {}\n\twith T = {}\n\tcaller {}",
       type_to_string(),
       cast_pointer_to_void(this),
       std::this_thread::get_id(),
