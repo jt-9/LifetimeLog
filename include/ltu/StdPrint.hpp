@@ -11,18 +11,16 @@ namespace ltu {
 
 struct StdPrintStrategy
 {
-  constexpr StdPrintStrategy() = default;
-
   template<class... Types>
-  constexpr void println(const std::format_string<Types...> format, Types &&...args) const noexcept
+  static constexpr void println(const std::format_string<Types...> format, Types &&...args) noexcept
   {
     std::println(format, std::forward<Types>(args)...);
   }
 
-  void println() const noexcept { std::println(); }
+  static void println() noexcept { std::println(); }
 
   template<class... Types>
-  constexpr void print(const std::format_string<Types...> format, Types &&...args) const noexcept
+  static constexpr void print(const std::format_string<Types...> format, Types &&...args) noexcept
   {
     std::print(format, std::forward<Types>(args)...);
   }

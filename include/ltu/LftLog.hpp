@@ -6,7 +6,7 @@
 #include "StringifyTemplateArgs.hpp"
 
 #include <concepts>
-//#include <stacktrace>
+// #include <stacktrace>
 #include <string_view>
 #include <thread>
 #include <utility>
@@ -32,7 +32,7 @@ template<typename T,
   = StdPrintStrategy
 #endif
   >
-struct LftLog : private PrintStrategy
+struct LftLog
 {
   using value_type = T;
 
@@ -147,7 +147,8 @@ struct LftLog : private PrintStrategy
   {
     t_ = std::move(rhs.t_);
 
-    PrintStrategy::println("{0}::operator=({0} &&rhs) move assignment instance {} thread {}\n\twith T = {}\n\tcaller {}",
+    PrintStrategy::println(
+      "{0}::operator=({0} &&rhs) move assignment instance {} thread {}\n\twith T = {}\n\tcaller {}",
       type_to_string(),
       cast_pointer_to_void(this),
       std::this_thread::get_id(),
@@ -216,7 +217,7 @@ private:
   LTU_TYPE_NAME_TO_STRING(LftLog<T>)
 };
 
-template<class PrintStrategy> struct LftLog<void, PrintStrategy> : private PrintStrategy
+template<class PrintStrategy> struct LftLog<void, PrintStrategy>
 {
   using value_type = void;
 
@@ -280,7 +281,8 @@ template<class PrintStrategy> struct LftLog<void, PrintStrategy> : private Print
 
   constexpr LftLog &operator=(LftLog &&) noexcept
   {
-    PrintStrategy::println("{0}::operator=({0} &&rhs) move assignment instance {} thread {}\n\twith T = {}\n\tcaller {}",
+    PrintStrategy::println(
+      "{0}::operator=({0} &&rhs) move assignment instance {} thread {}\n\twith T = {}\n\tcaller {}",
       type_to_string(),
       cast_pointer_to_void(this),
       std::this_thread::get_id(),
