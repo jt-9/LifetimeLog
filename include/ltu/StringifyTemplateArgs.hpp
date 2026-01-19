@@ -80,7 +80,7 @@ namespace details {
 #endif
 }// namespace details
 
-template<typename T> [[nodiscard]] constexpr auto GetTypeName(void) noexcept
+template<typename T> [[nodiscard]] constexpr ::std::string_view GetTypeName(void) noexcept
 {
   return details::GetTypeNameHelper<T>::GetTypeName();
 }

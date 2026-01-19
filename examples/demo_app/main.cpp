@@ -1,6 +1,8 @@
 // #include "ltu/FmtFormatter.hpp"
 // #include "ltu/FmtPrint.hpp"
 #include "ltu/LftLog.hpp"
+#include "ltu/MemFunTypeThisThreadIdStdFormatter.hpp"
+#include "ltu/StdPrint.hpp"
 
 #include <print>
 // #include <fmt/base.h>
@@ -16,7 +18,7 @@ int main(/*int argc, char **argv*/) noexcept
   std::println("wrapped_value = {}", wrapped_value);
 
   std::println("------------------------------");
-  const ltu::LftLog ld1{ wrapped_value };
+  const ltu::LftLog<decltype(wrapped_value) /*double*/, ltu::StdPrintStrategy, ltu::MemFunTypeThisThreadIdStdFormatter> ld1{ wrapped_value };
   std::println("li1 with wrapped_value = {}", ld1);
 
   std::println("------------------------------");
@@ -26,8 +28,16 @@ int main(/*int argc, char **argv*/) noexcept
 
   std::println("------------------------------");
 
+  // const std::pair<decltype(wrapped_value), decltype(wrapped_value2)> pair1 {wrapped_value, wrapped_value2};
+  // const auto formatter_pair = std::format("pair1 = {}", pair1);
+  // std::println("{}", formatter_pair);
+
   // NOLINTBEGIN(cppcoreguidelines-avoid-magic-numbers, readability-magic-numbers)
-  std::println("{} + {} - {} = {}", ld1, li2, ltu::LftLog{ 2.73F }, ltu::LftLog{ ld1 + li2 - static_cast<double>(ltu::LftLog{ 2.73F }) });
+  std::println("{} + {} - {} = {}",
+    ld1,
+    li2,
+    ltu::LftLog{ 2.73F },
+    ltu::LftLog{ ld1 + li2 - static_cast<double>(ltu::LftLog{ 2.73F }) });
   // NOLINTEND(cppcoreguidelines-avoid-magic-numbers, readability-magic-numbers)
 
   std::println("------------------------------");
