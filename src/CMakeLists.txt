@@ -25,4 +25,4 @@ add_lib_target(ltu-header-only INTERFACE)
 add_library(ltu::ltu-header-only ALIAS ltu-header-only)
 
 # Request minimum c++ standard, default c++20
-target_compile_features(ltu-header-only INTERFACE cxx_std_23)
+target_compile_features(ltu-header-only INTERFACE cxx_std_20)

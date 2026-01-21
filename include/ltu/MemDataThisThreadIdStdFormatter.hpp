@@ -1,5 +1,5 @@
-#ifndef LTU_MEMBER_FUNCTION_TYPE_THIS_THREADID_STD_FORMATTER
-#define LTU_MEMBER_FUNCTION_TYPE_THIS_THREADID_STD_FORMATTER
+#ifndef LTU_MEMBER_DATA_TYPE_THIS_THREADID_STD_FORMATTER
+#define LTU_MEMBER_DATA_TYPE_THIS_THREADID_STD_FORMATTER
 
 #include <format>
 #include <string_view>
@@ -9,7 +9,7 @@
 
 namespace ltu {
 
-struct MemFunTypeThisThreadIdStdFormatter final
+struct MemDataThisThreadIdStdFormatter final
 {
   template<typename Pointer>
     requires std::is_pointer_v<Pointer>
@@ -24,4 +24,4 @@ struct MemFunTypeThisThreadIdStdFormatter final
 
 }// namespace ltu
 
-#endif// LTU_MEMBER_FUNCTION_TYPE_THIS_THREADID_STD_FORMATTER
+#endif// LTU_MEMBER_DATA_TYPE_THIS_THREADID_STD_FORMATTER
