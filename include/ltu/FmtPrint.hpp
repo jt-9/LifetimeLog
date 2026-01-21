@@ -12,17 +12,15 @@ namespace ltu {
 
 struct FmtPrintStrategy
 {
-  constexpr FmtPrintStrategy() = default;
-
   template<class... Args>
-  constexpr void println(const fmt::format_string<Args...> format, Args &&...args) const noexcept
+  static constexpr void println(const fmt::format_string<Args...> format, Args &&...args) noexcept
   {
     fmt::println(format, std::forward<Args>(args)...);
   }
 
-  void println() const noexcept { fmt::println(""); }
+  static void println() noexcept { fmt::println(""); }
 
-  template<class... Args> constexpr void print(const fmt::format_string<Args...> format, Args &&...args) const noexcept
+  template<class... Args> static constexpr void print(const fmt::format_string<Args...> format, Args &&...args) noexcept
   {
     fmt::print(format, std::forward<Args>(args)...);
   }

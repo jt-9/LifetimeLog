@@ -2,14 +2,16 @@
 #define LTU_OBJECT_LIFETIME
 
 
+#include "MemDataThisStdFormatter.hpp"
 #include "StdPrint.hpp"
 #include "StringifyTemplateArgs.hpp"
 
 #include <concepts>
-//#include <stacktrace>
+// #include <stacktrace>
 #include <string_view>
-#include <thread>
+#include <type_traits>
 #include <utility>
+
 
 namespace ltu {
 namespace {
@@ -24,56 +26,41 @@ namespace {
   }
 }// namespace
 
-template<typename T, class PrintStrategy> struct LftLog;
+template<typename T, class PrintStrategy, class MemDataFormatter> struct LftLog;
 
 template<typename T,
   class PrintStrategy
 #ifdef __cpp_lib_print
   = StdPrintStrategy
 #endif
-  >
-struct LftLog : private PrintStrategy
+  ,
+  class MemDataFormatter = MemDataThisStdFormatter>
+struct LftLog
 {
   using value_type = T;
+  static inline constexpr auto k_arg_type_name = GetTypeName<value_type>();
 
   constexpr LftLog() noexcept
     requires std::is_default_constructible_v<T>
   {
-    PrintStrategy::println("{}() no argument constructor instance {} thread {}\n\twith T = {}\n\tcaller {}",
-      type_to_string(),
-      cast_pointer_to_void(this),
-      std::this_thread::get_id(),
-      GetTypeName<value_type>(),
-      ""
-      /*std::stacktrace::current(1, 1)*/);
+    PrintStrategy::println(
+      "{}() no argument ctor, {}", type_to_string(), MemDataFormatter::format(this, k_arg_type_name));
   }
 
   constexpr LftLog(const LftLog &src) noexcept
     requires std::is_copy_constructible_v<T>
     : t_{ src.t_ }
   {
-    PrintStrategy::println("{}(const {} &src) copy constructor instance {} thread {}\n\twith T = {}\n\tcaller {}",
-      type_to_string(),
-      type_to_string(),
-      cast_pointer_to_void(this),
-      std::this_thread::get_id(),
-      GetTypeName<value_type>(),
-      ""
-      /*std::stacktrace::current(1, 1)*/);
+    PrintStrategy::println(
+      "{0}(const {0} &src) copy ctor, {}", type_to_string(), MemDataFormatter::format(this, k_arg_type_name));
   }
 
   constexpr LftLog(LftLog &&src) noexcept
     requires std::is_move_constructible_v<T>
     : t_{ std::move(src.t_) }
   {
-    PrintStrategy::println("{}({} &&src) move constructor instance {} thread {}\n\twith T = {}\n\tcaller {}",
-      type_to_string(),
-      type_to_string(),
-      cast_pointer_to_void(this),
-      std::this_thread::get_id(),
-      GetTypeName<value_type>(),
-      ""
-      /*std::stacktrace::current(1, 1)*/);
+    PrintStrategy::println(
+      "{0}({0} &&src) move ctor, {}", type_to_string(), MemDataFormatter::format(this, k_arg_type_name));
   }
 
   // template<typename U>
@@ -92,38 +79,22 @@ struct LftLog : private PrintStrategy
     requires std::is_copy_constructible_v<T>
     : t_{ t }
   {
-    PrintStrategy::println(
-      "{}(const T &t) const l-value param constructor instance {} thread {}\n\twith T = {}\n\tcaller {}",
+    PrintStrategy::println("{}(const T &t) const l-value param ctor, {}",
       type_to_string(),
-      cast_pointer_to_void(this),
-      std::this_thread::get_id(),
-      GetTypeName<value_type>(),
-      ""
-      /*std::stacktrace::current(1, 1)*/);
+      MemDataFormatter::format(this, k_arg_type_name));
   }
 
   explicit constexpr LftLog(T &&t) noexcept
     requires std::is_move_constructible_v<T>
     : t_{ std::move(t) }
   {
-    PrintStrategy::println("{}(T &&t) r-value param constructor instance {} thread {}\n\twith T = {}\n\tcaller {}",
-      type_to_string(),
-      cast_pointer_to_void(this),
-      std::this_thread::get_id(),
-      GetTypeName<value_type>(),
-      ""
-      /*std::stacktrace::current(1, 1)*/);
+    PrintStrategy::println(
+      "{}(T &&t) r-value param ctor, {}", type_to_string(), MemDataFormatter::format(this, k_arg_type_name));
   }
 
   constexpr ~LftLog() noexcept
   {
-    PrintStrategy::println("~{}() destructor instance {} thread {}\n\twith T = {}\n\tcaller {}",
-      type_to_string(),
-      cast_pointer_to_void(this),
-      std::this_thread::get_id(),
-      GetTypeName<value_type>(),
-      ""
-      /*std::stacktrace::current(1, 1)*/);
+    PrintStrategy::println("~{}() dtor, {}", type_to_string(), MemDataFormatter::format(this, k_arg_type_name));
   }
 
   constexpr LftLog &operator=(const LftLog &rhs) & noexcept
@@ -131,15 +102,9 @@ struct LftLog : private PrintStrategy
   {
     t_ = rhs.t_;
 
-    PrintStrategy::println(
-      "{}::operator=(const {} &rhs) copy assignment instance {} thread {}\n\twith T = {}\n\tcaller {}",
+    PrintStrategy::println("{0}::operator=(const {0} &rhs) copy assign, {}",
       type_to_string(),
-      type_to_string(),
-      cast_pointer_to_void(this),
-      std::this_thread::get_id(),
-      GetTypeName<value_type>(),
-      ""
-      /*std::stacktrace::current(1, 1)*/);
+      MemDataFormatter::format(this, k_arg_type_name));
 
     return *this;
   }
@@ -149,66 +114,41 @@ struct LftLog : private PrintStrategy
   {
     t_ = std::move(rhs.t_);
 
-    PrintStrategy::println("{}::operator=({} &&rhs) move assignment instance {} thread {}\n\twith T = {}\n\tcaller {}",
+    PrintStrategy::println("{0}::operator=({0} &&rhs) move assign, {}",
       type_to_string(),
-      type_to_string(),
-      cast_pointer_to_void(this),
-      std::this_thread::get_id(),
-      GetTypeName<value_type>(),
-      ""
-      /*std::stacktrace::current(1, 1)*/);
+      MemDataFormatter::format(this, k_arg_type_name));
 
     return *this;
   }
 
   [[nodiscard]] constexpr operator T &() & noexcept
   {
-    PrintStrategy::println("{}::operator T&() cast operator instance {} thread {}\n\twith T = {}",
-      type_to_string(),
-      cast_pointer_to_void(this),
-      std::this_thread::get_id(),
-      GetTypeName<value_type>(),
-      ""
-      /*std::stacktrace::current(1, 1)*/);
+    PrintStrategy::println(
+      "{}::operator T&(), {}", type_to_string(), MemDataFormatter::format(this, k_arg_type_name));
 
     return t_;
   }
 
   [[nodiscard]] constexpr operator const T &() const & noexcept
   {
-    PrintStrategy::println("{}::operator const T&() const cast operator instance {} thread {}\n\twith T = {}",
-      type_to_string(),
-      cast_pointer_to_void(this),
-      std::this_thread::get_id(),
-      GetTypeName<value_type>(),
-      ""
-      /*std::stacktrace::current(1, 1)*/);
+    PrintStrategy::println(
+      "{}::operator const T&(), {}", type_to_string(), MemDataFormatter::format(this, k_arg_type_name));
 
     return t_;
   }
 
   [[nodiscard]] constexpr operator T &&() && noexcept
   {
-    PrintStrategy::println("{}::operator T&&() cast operator instance {} thread {}\n\twith T = {}",
-      type_to_string(),
-      cast_pointer_to_void(this),
-      std::this_thread::get_id(),
-      GetTypeName<value_type>(),
-      ""
-      /*std::stacktrace::current(1, 1)*/);
+    PrintStrategy::println(
+      "{}::operator T&&(), {}", type_to_string(), MemDataFormatter::format(this, k_arg_type_name));
 
     return std::move(t_);
   }
 
   [[nodiscard]] constexpr operator const T &&() const && noexcept
   {
-    PrintStrategy::println("{}::operator const T&&() const cast operator instance {} thread {}\n\twith T = {}",
-      type_to_string(),
-      cast_pointer_to_void(this),
-      std::this_thread::get_id(),
-      GetTypeName<value_type>(),
-      ""
-      /*std::stacktrace::current(1, 1)*/);
+    PrintStrategy::println(
+      "{}::operator const T&&() const, {}", type_to_string(), MemDataFormatter::format(this, k_arg_type_name));
 
     return std::move(t_);
   }
@@ -219,81 +159,48 @@ private:
   LTU_TYPE_NAME_TO_STRING(LftLog<T>)
 };
 
-template<class PrintStrategy> struct LftLog<void, PrintStrategy> : private PrintStrategy
+template<class PrintStrategy, class MemDataFormatter> struct LftLog<void, PrintStrategy, MemDataFormatter>
 {
   using value_type = void;
+  static inline constexpr auto k_arg_type_name = GetTypeName<value_type>();
 
   constexpr LftLog() noexcept
   {
-    PrintStrategy::println("{}() no argument constructor instance {} thread {}\n\twith T = {}\n\tcaller {}",
-      type_to_string(),
-      cast_pointer_to_void(this),
-      std::this_thread::get_id(),
-      GetTypeName<value_type>(),
-      ""
-      /*std::stacktrace::current(1, 1)*/);
+    PrintStrategy::println(
+      "{}() no argument ctor, {}", type_to_string(), MemDataFormatter::format(this, k_arg_type_name));
   }
 
   constexpr LftLog(const LftLog &) noexcept
   {
-    PrintStrategy::println("{}(const {} &src) copy constructor instance {} thread {}\n\twith T = {}\n\tcaller {}",
-      type_to_string(),
-      type_to_string(),
-      cast_pointer_to_void(this),
-      std::this_thread::get_id(),
-      GetTypeName<value_type>(),
-      ""
-      /*std::stacktrace::current(1, 1)*/);
+    PrintStrategy::println(
+      "{0}(const {0} &src) copy ctor, {}", type_to_string(), MemDataFormatter::format(this, k_arg_type_name));
   }
 
   constexpr LftLog(LftLog &&) noexcept
   {
-    PrintStrategy::println("{}({} &&src) move constructor instance {} thread {}\n\twith T = {}\n\tcaller {}",
-      type_to_string(),
-      type_to_string(),
-      cast_pointer_to_void(this),
-      std::this_thread::get_id(),
-      GetTypeName<value_type>(),
-      ""
-      /*std::stacktrace::current(1, 1)*/);
+    PrintStrategy::println(
+      "{0}({0} &&src) move ctor, {}", type_to_string(), MemDataFormatter::format(this, k_arg_type_name));
   }
 
   constexpr ~LftLog() noexcept
   {
-    PrintStrategy::println("~{}() destructor instance {} thread {}\n\twith T = {}\n\tcaller {}",
-      type_to_string(),
-      cast_pointer_to_void(this),
-      std::this_thread::get_id(),
-      GetTypeName<value_type>(),
-      ""
-      /*std::stacktrace::current(1, 1)*/);
+    PrintStrategy::println("~{}() dtor, {}", type_to_string(), MemDataFormatter::format(this, k_arg_type_name));
   }
 
   constexpr LftLog &operator=(const LftLog &) & noexcept
   {
-    PrintStrategy::println(
-      "{}::operator=(const {} &rhs) copy assignment instance {} thread {}\n\twith T = {}\n\tcaller {}",
+    PrintStrategy::println("{0}::operator=(const {0} &rhs) copy assign, {}",
       type_to_string(),
-      type_to_string(),
-      cast_pointer_to_void(this),
-      std::this_thread::get_id(),
-      GetTypeName<value_type>(),
-      ""
-      /*std::stacktrace::current(1, 1)*/);
+      MemDataFormatter::format(this, k_arg_type_name));
 
     return *this;
   }
 
   constexpr LftLog &operator=(LftLog &&) noexcept
   {
-    PrintStrategy::println("{}::operator=({} &&rhs) move assignment instance {} thread {}\n\twith T = {}\n\tcaller {}",
+    PrintStrategy::println("{0}::operator=({0} &&rhs) move assign, {}",
       type_to_string(),
-      type_to_string(),
-      cast_pointer_to_void(this),
-      std::this_thread::get_id(),
-      GetTypeName<value_type>(),
-      ""
-      /*std::stacktrace::current(1, 1)*/);
+      MemDataFormatter::format(this, k_arg_type_name));
 
     return *this;
   }
@@ -305,15 +212,23 @@ private:
 }// namespace ltu
 
 #ifdef __cpp_lib_print
-template<class CharT, typename Type, class PrintStrategy>
-// requires(!std::is_void_v<Type>)
-struct std::formatter<ltu::LftLog<Type, PrintStrategy>, CharT> : std::formatter<Type, CharT>
+template<class CharT, typename Type, class PrintStrategy, class MemDataFormatter>
+  requires std::formattable<Type, CharT>
+struct std::formatter<ltu::LftLog<Type, PrintStrategy, MemDataFormatter>, CharT>
+  : std::formatter<std::remove_cvref_t<Type>, CharT>
 {
   static_assert(!std::is_void_v<Type>, "Type 'void' is not formattable");
 
-  template<typename FormatContext> constexpr FormatContext::iterator format(const Type &value, FormatContext &ctx) const
+private:
+  using maybe_const_LftLog = std::conditional_t<std::formattable<const Type, CharT>,
+    const ltu::LftLog<Type, PrintStrategy, MemDataFormatter>,
+    ltu::LftLog<Type, PrintStrategy, MemDataFormatter>>;
+
+public:
+  template<typename FormatContext>
+  constexpr FormatContext::iterator format(maybe_const_LftLog &value, FormatContext &ctx) const
   {
-    return std::formatter<Type, CharT>::format(value, ctx);
+    return std::formatter<std::remove_cvref_t<Type>, CharT>::format(value.t_, ctx);
   }
 };
 #endif

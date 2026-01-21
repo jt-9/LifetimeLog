@@ -21,7 +21,7 @@ namespace details {
     using namespace std::literals::string_view_literals;
 
     //" \t\n\v\r\f"sv
-    static constexpr auto kWhitespaces = " \t"sv;
+    /*static*/ constexpr auto kWhitespaces = " \t"sv;
 
     std::size_t start = 0;
     while (start < in.size() && is_space(in[start], kWhitespaces)) { ++start; }
@@ -36,7 +36,7 @@ namespace details {
     GetTypeNameSubStr(::std::string_view kFullName, ::std::string_view front, ::std::string_view back) noexcept
   {
     const std::size_t kStartPos = kFullName.find(front);
-    std::size_t ArgStartPos = (kStartPos != std::string_view::npos) ? kStartPos + front.size() : 0zu;
+    std::size_t ArgStartPos = (kStartPos != std::string_view::npos) ? kStartPos + front.size() : 0;
 
     const std::size_t kEndPos = kFullName.find(back);
     std::size_t ArgEndPos = (kEndPos != std::string_view::npos) ? kEndPos : kFullName.size();
@@ -80,7 +80,7 @@ namespace details {
 #endif
 }// namespace details
 
-template<typename T> [[nodiscard]] constexpr auto GetTypeName(void) noexcept
+template<typename T> [[nodiscard]] constexpr ::std::string_view GetTypeName(void) noexcept
 {
   return details::GetTypeNameHelper<T>::GetTypeName();
 }
