@@ -1,6 +1,8 @@
 #ifndef LTU_MEMBER_DATA_TYPE_THIS_THREADID_STD_FORMATTER
 #define LTU_MEMBER_DATA_TYPE_THIS_THREADID_STD_FORMATTER
 
+#include "FixedString.hpp"
+
 #include <format>
 #include <string_view>
 #include <thread>
@@ -9,16 +11,12 @@
 
 namespace ltu {
 
+template<fixed_string fmt = fixed_string{ "\n\tthis = {}, thread id = {},\n\twith T = {}" }>
 struct MemDataThisThreadIdStdFormatter final
 {
-  template<typename Pointer>
-    requires std::is_pointer_v<Pointer>
-  [[nodiscard]] static auto format(const Pointer ptr, std::string_view arg_type_name) noexcept
+  [[nodiscard]] static auto format(const void *const ptr, std::string_view arg_type_name) noexcept
   {
-    return std::format("this = {}, thread id = {},\n\twith T = {}",
-      static_cast<const void *>(ptr),
-      std::this_thread::get_id(),
-      arg_type_name);
+    return std::format(fmt, ptr, std::this_thread::get_id(), arg_type_name);
   }
 };
 

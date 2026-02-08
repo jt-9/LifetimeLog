@@ -1,25 +1,27 @@
 #include "ltu/LftLog.hpp"
 
-//*/
+/*/
 #include "ltu/StdPrint.hpp"
-#include "ltu/MemDataThisThreadIdStdFormatter.hpp"
+#include "ltu/MemDataThisStdFormatter.hpp"
+//#include "ltu/MemDataThisThreadIdStdFormatter.hpp"
 
 #include <print>
 
 namespace proj_fmt = ::std;
 using LtuPrintStrategy = ltu::StdPrintStrategy;
-using LtuMemDataFormatter = ltu::MemDataThisThreadIdStdFormatter;
+using LtuMemDataFormatter = ltu::MemDataThisStdFormatter<>;
 //*/
-/*/
+//*/
 #include "ltu/FmtFormatter.hpp"
 #include "ltu/FmtPrint.hpp"
+// #include "ltu/MemDataThisFmtFormatter.hpp"
 #include "ltu/MemDataThisThreadIdFmtFormatter.hpp"
 
 #include <fmt/base.h>
 
 namespace proj_fmt = ::fmt;
 using LtuPrintStrategy = ltu::FmtPrintStrategy;
-using LtuMemDataFormatter = ltu::MemDataThisThreadIdFmtFormatter;
+using LtuMemDataFormatter = ltu::MemDataThisThreadIdFmtFormatter<>;
 //*/
 
 

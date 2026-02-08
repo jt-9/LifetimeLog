@@ -1,6 +1,8 @@
 #ifndef LTU_MEMBER_DATA_TYPE_THIS_STD_FORMATTER
 #define LTU_MEMBER_DATA_TYPE_THIS_STD_FORMATTER
 
+#include "FixedString.hpp"
+
 #include <format>
 #include <string_view>
 #include <type_traits>
@@ -8,13 +10,12 @@
 
 namespace ltu {
 
+template<fixed_string fmt = fixed_string{ "\n\tthis = {}\n\twith T = {}" }>
 struct MemDataThisStdFormatter final
 {
-  template<typename Pointer>
-    requires std::is_pointer_v<Pointer>
-  [[nodiscard]] static auto format(const Pointer ptr, std::string_view arg_type_name) noexcept
+  [[nodiscard]] static auto format(const void *const ptr, std::string_view arg_type_name) noexcept
   {
-    return std::format("this = {}\n\twith T = {}", static_cast<const void *>(ptr), arg_type_name);
+    return std::format(fmt, ptr, arg_type_name);
   }
 };
 

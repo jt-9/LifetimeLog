@@ -34,17 +34,17 @@ template<typename T,
   = StdPrintStrategy
 #endif
   ,
-  class MemDataFormatter = MemDataThisStdFormatter>
+  class MemDataFormatter = MemDataThisStdFormatter<>>
 struct LftLog
 {
   using value_type = T;
-  static inline constexpr auto k_arg_type_name = GetTypeName<value_type>();
+  static constexpr auto k_arg_type_name = GetTypeName<value_type>();
 
   constexpr LftLog() noexcept
     requires std::is_default_constructible_v<T>
   {
     PrintStrategy::println(
-      "{}() no argument ctor, {}", type_to_string(), MemDataFormatter::format(this, k_arg_type_name));
+      "{}() no argument ctor{}", type_to_string(), MemDataFormatter::format(this, k_arg_type_name));
   }
 
   constexpr LftLog(const LftLog &src) noexcept
@@ -52,7 +52,7 @@ struct LftLog
     : t_{ src.t_ }
   {
     PrintStrategy::println(
-      "{0}(const {0} &src) copy ctor, {}", type_to_string(), MemDataFormatter::format(this, k_arg_type_name));
+      "{0}(const {0} &src) copy ctor{}", type_to_string(), MemDataFormatter::format(this, k_arg_type_name));
   }
 
   constexpr LftLog(LftLog &&src) noexcept
@@ -60,7 +60,7 @@ struct LftLog
     : t_{ std::move(src.t_) }
   {
     PrintStrategy::println(
-      "{0}({0} &&src) move ctor, {}", type_to_string(), MemDataFormatter::format(this, k_arg_type_name));
+      "{0}({0} &&src) move ctor{}", type_to_string(), MemDataFormatter::format(this, k_arg_type_name));
   }
 
   // template<typename U>
@@ -79,9 +79,8 @@ struct LftLog
     requires std::is_copy_constructible_v<T>
     : t_{ t }
   {
-    PrintStrategy::println("{}(const T &t) const l-value param ctor, {}",
-      type_to_string(),
-      MemDataFormatter::format(this, k_arg_type_name));
+    PrintStrategy::println(
+      "{}(const T &t) const l-value param ctor{}", type_to_string(), MemDataFormatter::format(this, k_arg_type_name));
   }
 
   explicit constexpr LftLog(T &&t) noexcept
@@ -89,12 +88,12 @@ struct LftLog
     : t_{ std::move(t) }
   {
     PrintStrategy::println(
-      "{}(T &&t) r-value param ctor, {}", type_to_string(), MemDataFormatter::format(this, k_arg_type_name));
+      "{}(T &&t) r-value param ctor{}", type_to_string(), MemDataFormatter::format(this, k_arg_type_name));
   }
 
   constexpr ~LftLog() noexcept
   {
-    PrintStrategy::println("~{}() dtor, {}", type_to_string(), MemDataFormatter::format(this, k_arg_type_name));
+    PrintStrategy::println("~{}() dtor{}", type_to_string(), MemDataFormatter::format(this, k_arg_type_name));
   }
 
   constexpr LftLog &operator=(const LftLog &rhs) & noexcept
@@ -102,7 +101,7 @@ struct LftLog
   {
     t_ = rhs.t_;
 
-    PrintStrategy::println("{0}::operator=(const {0} &rhs) copy assign, {}",
+    PrintStrategy::println("{0}::operator=(const {0} &rhs) copy assign{}",
       type_to_string(),
       MemDataFormatter::format(this, k_arg_type_name));
 
@@ -114,17 +113,15 @@ struct LftLog
   {
     t_ = std::move(rhs.t_);
 
-    PrintStrategy::println("{0}::operator=({0} &&rhs) move assign, {}",
-      type_to_string(),
-      MemDataFormatter::format(this, k_arg_type_name));
+    PrintStrategy::println(
+      "{0}::operator=({0} &&rhs) move assign{}", type_to_string(), MemDataFormatter::format(this, k_arg_type_name));
 
     return *this;
   }
 
   [[nodiscard]] constexpr operator T &() & noexcept
   {
-    PrintStrategy::println(
-      "{}::operator T&(), {}", type_to_string(), MemDataFormatter::format(this, k_arg_type_name));
+    PrintStrategy::println("{}::operator T&(){}", type_to_string(), MemDataFormatter::format(this, k_arg_type_name));
 
     return t_;
   }
@@ -132,15 +129,14 @@ struct LftLog
   [[nodiscard]] constexpr operator const T &() const & noexcept
   {
     PrintStrategy::println(
-      "{}::operator const T&(), {}", type_to_string(), MemDataFormatter::format(this, k_arg_type_name));
+      "{}::operator const T&(){}", type_to_string(), MemDataFormatter::format(this, k_arg_type_name));
 
     return t_;
   }
 
   [[nodiscard]] constexpr operator T &&() && noexcept
   {
-    PrintStrategy::println(
-      "{}::operator T&&(), {}", type_to_string(), MemDataFormatter::format(this, k_arg_type_name));
+    PrintStrategy::println("{}::operator T&&(){}", type_to_string(), MemDataFormatter::format(this, k_arg_type_name));
 
     return std::move(t_);
   }
@@ -148,7 +144,7 @@ struct LftLog
   [[nodiscard]] constexpr operator const T &&() const && noexcept
   {
     PrintStrategy::println(
-      "{}::operator const T&&() const, {}", type_to_string(), MemDataFormatter::format(this, k_arg_type_name));
+      "{}::operator const T&&() const{}", type_to_string(), MemDataFormatter::format(this, k_arg_type_name));
 
     return std::move(t_);
   }
@@ -162,34 +158,34 @@ private:
 template<class PrintStrategy, class MemDataFormatter> struct LftLog<void, PrintStrategy, MemDataFormatter>
 {
   using value_type = void;
-  static inline constexpr auto k_arg_type_name = GetTypeName<value_type>();
+  static constexpr auto k_arg_type_name = GetTypeName<value_type>();
 
   constexpr LftLog() noexcept
   {
     PrintStrategy::println(
-      "{}() no argument ctor, {}", type_to_string(), MemDataFormatter::format(this, k_arg_type_name));
+      "{}() no argument ctor{}", type_to_string(), MemDataFormatter::format(this, k_arg_type_name));
   }
 
   constexpr LftLog(const LftLog &) noexcept
   {
     PrintStrategy::println(
-      "{0}(const {0} &src) copy ctor, {}", type_to_string(), MemDataFormatter::format(this, k_arg_type_name));
+      "{0}(const {0} &src) copy ctor{}", type_to_string(), MemDataFormatter::format(this, k_arg_type_name));
   }
 
   constexpr LftLog(LftLog &&) noexcept
   {
     PrintStrategy::println(
-      "{0}({0} &&src) move ctor, {}", type_to_string(), MemDataFormatter::format(this, k_arg_type_name));
+      "{0}({0} &&src) move ctor{}", type_to_string(), MemDataFormatter::format(this, k_arg_type_name));
   }
 
   constexpr ~LftLog() noexcept
   {
-    PrintStrategy::println("~{}() dtor, {}", type_to_string(), MemDataFormatter::format(this, k_arg_type_name));
+    PrintStrategy::println("~{}() dtor{}", type_to_string(), MemDataFormatter::format(this, k_arg_type_name));
   }
 
   constexpr LftLog &operator=(const LftLog &) & noexcept
   {
-    PrintStrategy::println("{0}::operator=(const {0} &rhs) copy assign, {}",
+    PrintStrategy::println("{0}::operator=(const {0} &rhs) copy assign{}",
       type_to_string(),
       MemDataFormatter::format(this, k_arg_type_name));
 
@@ -198,9 +194,8 @@ template<class PrintStrategy, class MemDataFormatter> struct LftLog<void, PrintS
 
   constexpr LftLog &operator=(LftLog &&) noexcept
   {
-    PrintStrategy::println("{0}::operator=({0} &&rhs) move assign, {}",
-      type_to_string(),
-      MemDataFormatter::format(this, k_arg_type_name));
+    PrintStrategy::println(
+      "{0}::operator=({0} &&rhs) move assign{}", type_to_string(), MemDataFormatter::format(this, k_arg_type_name));
 
     return *this;
   }
