@@ -10,12 +10,11 @@
 
 namespace ltu {
 
-template<fixed_string fmt = "\n\tthis = {}\n\twith T = {}">
-struct MemDataThisFmtFormatter final
+template<fixed_string fmt = "\n\tthis = {}\n\twith T = {}"> struct MemDataThisFmtFormatter final
 {
   [[nodiscard]] static auto format(const void *const ptr, std::string_view arg_type_name) noexcept
   {
-    return fmt::format(fmt, ptr, arg_type_name);
+    return fmt::format(fmt.view(), ptr, arg_type_name);
   }
 };
 

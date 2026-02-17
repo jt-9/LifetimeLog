@@ -2,14 +2,14 @@
 
 /*/
 #include "ltu/StdPrint.hpp"
-#include "ltu/MemDataThisStdFormatter.hpp"
-//#include "ltu/MemDataThisThreadIdStdFormatter.hpp"
+//#include "ltu/MemDataThisStdFormatter.hpp"
+#include "ltu/MemDataThisThreadIdStdFormatter.hpp"
 
 #include <print>
 
 namespace proj_fmt = ::std;
 using LtuPrintStrategy = ltu::StdPrintStrategy;
-using LtuMemDataFormatter = ltu::MemDataThisStdFormatter<>;
+using LtuMemDataFormatter = ltu::MemDataThisThreadIdStdFormatter<>;
 //*/
 //*/
 #include "ltu/FmtFormatter.hpp"

@@ -11,12 +11,12 @@
 
 namespace ltu {
 
-template<fixed_string fmt = fixed_string{ "\n\tthis = {}, thread id = {},\n\twith T = {}" }>
+template<fixed_string fmt = "\n\tthis = {}, thread id = {},\n\twith T = {}">
 struct MemDataThisThreadIdStdFormatter final
 {
   [[nodiscard]] static auto format(const void *const ptr, std::string_view arg_type_name) noexcept
   {
-    return std::format(fmt, ptr, std::this_thread::get_id(), arg_type_name);
+    return std::format(fmt.view(), ptr, std::this_thread::get_id(), arg_type_name);
   }
 };
 
