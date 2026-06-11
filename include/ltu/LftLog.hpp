@@ -21,9 +21,7 @@ namespace {
   template<typename Ptr>
     requires std::is_pointer_v<Ptr>
   [[nodiscard]] constexpr const void *cast_pointer_to_void(const Ptr ptr) noexcept
-  {
-    return static_cast<const void *>(ptr);
-  }
+  { return static_cast<const void *>(ptr); }
 }// namespace
 
 template<typename T, class PrintStrategy, class MemDataFormatter> struct LftLog;
@@ -92,9 +90,7 @@ struct LftLog
   }
 
   constexpr ~LftLog() noexcept
-  {
-    PrintStrategy::println("~{}() dtor{}", type_to_string(), MemDataFormatter::format(this, k_arg_type_name));
-  }
+  { PrintStrategy::println("~{}() dtor{}", type_to_string(), MemDataFormatter::format(this, k_arg_type_name)); }
 
   constexpr LftLog &operator=(const LftLog &rhs) & noexcept
     requires std::is_copy_assignable_v<T>
@@ -148,7 +144,7 @@ struct LftLog
 
     return std::move(t_);
   }
-
+  // cppcheck-suppress uninitMemberVarNoCtor; Intended
   T t_;
 
 private:
@@ -179,9 +175,7 @@ template<class PrintStrategy, class MemDataFormatter> struct LftLog<void, PrintS
   }
 
   constexpr ~LftLog() noexcept
-  {
-    PrintStrategy::println("~{}() dtor{}", type_to_string(), MemDataFormatter::format(this, k_arg_type_name));
-  }
+  { PrintStrategy::println("~{}() dtor{}", type_to_string(), MemDataFormatter::format(this, k_arg_type_name)); }
 
   constexpr LftLog &operator=(const LftLog &) & noexcept
   {
@@ -222,9 +216,7 @@ private:
 public:
   template<typename FormatContext>
   constexpr FormatContext::iterator format(maybe_const_LftLog &value, FormatContext &ctx) const
-  {
-    return std::formatter<std::remove_cvref_t<Type>, CharT>::format(value.t_, ctx);
-  }
+  { return std::formatter<std::remove_cvref_t<Type>, CharT>::format(value.t_, ctx); }
 };
 #endif
 
