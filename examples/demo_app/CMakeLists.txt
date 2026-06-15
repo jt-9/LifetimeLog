@@ -25,6 +25,7 @@ target_link_libraries(${EXEC_TARGET} PRIVATE
 target_link_system_libraries(${EXEC_TARGET} PRIVATE 
                                             CLI11::CLI11
                                             fmt::fmt
+                                            urc::urc
                                             # spdlog::spdlog
                             )
 

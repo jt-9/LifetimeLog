@@ -32,4 +32,8 @@ function(myproject_setup_dependencies)
     cpmaddpackage("gh:CLIUtils/CLI11@2.6.2")
   endif()
 
+  if (NOT TARGET urc::urc)
+    cpmaddpackage("gh:jt-9/raii-unique_rc@0.0.2")
+  endif()
+
 endfunction()

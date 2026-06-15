@@ -25,6 +25,8 @@ using LtuMemDataFormatter = ltu::MemDataThisThreadIdFmtFormatter<>;
 //*/
 
 
+#include <urc/unique_ptr.hpp>
+
 // NOLINTNEXTLINE(bugprone-exception-escape)
 int main(/*int argc, char **argv*/) noexcept
 {
@@ -58,6 +60,8 @@ int main(/*int argc, char **argv*/) noexcept
   // Shouldn't compile due to static_assert in template specialisation for void in std::formatter<ltu::LftLog<...>>
   //  std::println("{}", lv1);
 
+
+  ltu::LftLog<raii::unique_ptr<int>, LtuPrintStrategy, LtuMemDataFormatter> lptr1{ std::in_place, new int(8) };
 
   return 0;
 }

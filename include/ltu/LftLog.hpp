@@ -38,14 +38,14 @@ struct LftLog
   using value_type = T;
   static constexpr auto k_arg_type_name = GetTypeName<value_type>();
 
-  constexpr LftLog() noexcept
+  constexpr LftLog() noexcept(std::is_nothrow_default_constructible_v<T>)
     requires std::is_default_constructible_v<T>
   {
     PrintStrategy::println(
       "{}() no argument ctor{}", type_to_string(), MemDataFormatter::format(this, k_arg_type_name));
   }
 
-  constexpr LftLog(const LftLog &src) noexcept
+  constexpr LftLog(const LftLog &src) noexcept(std::is_nothrow_copy_constructible_v<T>)
     requires std::is_copy_constructible_v<T>
     : t_{ src.t_ }
   {
@@ -53,7 +53,7 @@ struct LftLog
       "{0}(const {0} &src) copy ctor{}", type_to_string(), MemDataFormatter::format(this, k_arg_type_name));
   }
 
-  constexpr LftLog(LftLog &&src) noexcept
+  constexpr LftLog(LftLog &&src) noexcept(std::is_nothrow_move_constructible_v<T>)
     requires std::is_move_constructible_v<T>
     : t_{ std::move(src.t_) }
   {
@@ -73,7 +73,7 @@ struct LftLog
   //     std::this_thread::get_id());
   // }
 
-  explicit constexpr LftLog(const T &t) noexcept
+  explicit constexpr LftLog(const T &t) noexcept(std::is_nothrow_copy_constructible_v<T>)
     requires std::is_copy_constructible_v<T>
     : t_{ t }
   {
@@ -81,7 +81,7 @@ struct LftLog
       "{}(const T &t) const l-value param ctor{}", type_to_string(), MemDataFormatter::format(this, k_arg_type_name));
   }
 
-  explicit constexpr LftLog(T &&t) noexcept
+  explicit constexpr LftLog(T &&t) noexcept(std::is_nothrow_move_constructible_v<T>)
     requires std::is_move_constructible_v<T>
     : t_{ std::move(t) }
   {
@@ -89,10 +89,30 @@ struct LftLog
       "{}(T &&t) r-value param ctor{}", type_to_string(), MemDataFormatter::format(this, k_arg_type_name));
   }
 
-  constexpr ~LftLog() noexcept
+  template<class... Args>
+    requires std::is_constructible_v<T, Args...>
+  explicit constexpr LftLog(std::in_place_t, Args &&...args) noexcept(std::is_nothrow_constructible_v<T, Args...>) 
+    : t_{ std::forward<Args>(args)... }
+  {
+    PrintStrategy::println(
+      "{}(std::in_place_t, Args... args) in place ctor{}", type_to_string(), MemDataFormatter::format(this, k_arg_type_name));
+  }
+
+  template<class U, class... Args>
+    requires std::is_constructible_v<T, std::initializer_list<U>&, Args...>
+  explicit constexpr LftLog(std::in_place_t, std::initializer_list<U> ilist, Args &&...args) noexcept(
+    std::is_nothrow_constructible_v<T, std::initializer_list<U> &, Args...>) 
+    : t_{ ilist, std::forward<Args>(args)... }
+  {
+    PrintStrategy::println("{}(std::in_place_t, std::initializer_list<U> ilist, Args... args) in place ctor{}",
+      type_to_string(),
+      MemDataFormatter::format(this, k_arg_type_name));
+  }
+
+  constexpr ~LftLog() noexcept(std::is_nothrow_destructible_v<T>)
   { PrintStrategy::println("~{}() dtor{}", type_to_string(), MemDataFormatter::format(this, k_arg_type_name)); }
 
-  constexpr LftLog &operator=(const LftLog &rhs) & noexcept
+  constexpr LftLog &operator=(const LftLog &rhs) & noexcept(std::is_nothrow_assignable_v<T>)
     requires std::is_copy_assignable_v<T>
   {
     t_ = rhs.t_;
@@ -104,7 +124,7 @@ struct LftLog
     return *this;
   }
 
-  constexpr LftLog &operator=(LftLog &&rhs) noexcept
+  constexpr LftLog &operator=(LftLog &&rhs) noexcept(std::is_nothrow_move_assignable_v<T>)
     requires std::is_move_assignable_v<T>
   {
     t_ = std::move(rhs.t_);
