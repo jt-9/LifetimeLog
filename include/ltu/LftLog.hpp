@@ -10,13 +10,16 @@
 // #include <stacktrace>
 #include <string_view>
 #include <type_traits>
-#include <utility>
+#include <utility>// std::in_place_t
 
 
 namespace ltu {
 namespace {
-#define LTU_TYPE_NAME_TO_STRING(A) \
+#define LTU_TYPE_NAME_TO_STRING_FUNC(A) \
   [[nodiscard]] static constexpr std::string_view type_to_string() noexcept { return std::string_view{ #A }; }
+
+#define LTU_TYPE_TO_STRING_VIEW(A) \
+  std::string_view { #A }
 
   template<typename Ptr>
     requires std::is_pointer_v<Ptr>
@@ -61,47 +64,66 @@ struct LftLog
       "{0}({0} &&src) move ctor{}", type_to_string(), MemDataFormatter::format(this, k_arg_type_name));
   }
 
-  // template<typename U>
-  //   requires(!std::is_same_v<std::remove_cvref_t<U>, LftLog<T, PrintStrategy>>)
-  // constexpr LftLog(U &&u) noexcept
-  //   requires std::constructible_from<T, U>
-  //   : t_{ std::forward<U>(u) }
-  //{
-  //   println("{}(U &&u) convert constructor instance {} thread {}",
-  //     type_to_string(),
-  //     cast_pointer_to_void(this),
-  //     std::this_thread::get_id());
-  // }
-
-  explicit constexpr LftLog(const T &t) noexcept(std::is_nothrow_copy_constructible_v<T>)
-    requires std::is_copy_constructible_v<T>
-    : t_{ t }
+  template<typename U = std::remove_cv_t<T>>
+    requires(!std::is_same_v<LftLog, std::remove_cv_t<U>>) && (!std::is_same_v<std::in_place_t, std::remove_cvref_t<U>>)
+            && std::is_constructible_v<T, const U &>
+            explicit /*(!std::is_convertible_v<const U &, T>)*/
+            constexpr LftLog(const U &u) noexcept(std::is_nothrow_constructible_v<T, U>)
+    : t_{ u }
   {
     PrintStrategy::println(
-      "{}(const T &t) const l-value param ctor{}", type_to_string(), MemDataFormatter::format(this, k_arg_type_name));
+      "{}(const U &u) const l-value param ctor{}", type_to_string(), MemDataFormatter::format(this, k_arg_type_name));
   }
 
-  explicit constexpr LftLog(T &&t) noexcept(std::is_nothrow_move_constructible_v<T>)
-    requires std::is_move_constructible_v<T>
-    : t_{ std::move(t) }
+    template<typename U = std::remove_cv_t<T>>
+    requires(!std::is_same_v<LftLog, std::remove_cv_t<U>>) && (!std::is_same_v<std::in_place_t, std::remove_cvref_t<U>>)
+            && std::is_constructible_v<T, U>
+            explicit /*(!std::is_convertible_v<U, T>)*/
+            constexpr LftLog(U &&u) noexcept(std::is_nothrow_constructible_v<T, U>)
+    : t_{ std::move(u) }
   {
     PrintStrategy::println(
-      "{}(T &&t) r-value param ctor{}", type_to_string(), MemDataFormatter::format(this, k_arg_type_name));
+      "{}(U &&u) r-value param ctor{}", type_to_string(), MemDataFormatter::format(this, k_arg_type_name));
+  }
+
+  template<typename U, class PrintStrat, class MemDataFmt>
+    requires(!std::is_same_v<T, U>) && std::is_constructible_v<T, const U &>// && __construct_from_contained_value<_Up>
+  explicit(!std::is_convertible_v<const U &, T>) constexpr LftLog(
+    const LftLog<U, PrintStrat, MemDataFmt> &src) noexcept(std::is_nothrow_constructible_v<T, const U &>)
+    : t_{ src.t_ }
+  {
+    PrintStrategy::println("{}(const {} &src) copy converting ctor{}",
+      type_to_string(),
+      LTU_TYPE_TO_STRING_VIEW(LftLog<U>),
+      MemDataFormatter::format(this, k_arg_type_name));
+  }
+
+  template<typename U, class PrintStrat, class MemDataFmt>
+    requires(!std::is_same_v<T, U>) && std::is_constructible_v<T, U>// && __construct_from_contained_value<_Up>
+  explicit(!std::is_convertible_v<U, T>) constexpr LftLog(LftLog<U, PrintStrat, MemDataFmt> &&src) noexcept(
+    std::is_nothrow_constructible_v<T, U>)
+    : t_{ std::move(src.t_) }
+  {
+    PrintStrategy::println("{}({} &&src) move converting ctor{}",
+      type_to_string(),
+      LTU_TYPE_TO_STRING_VIEW(LftLog<U>),
+      MemDataFormatter::format(this, k_arg_type_name));
   }
 
   template<class... Args>
     requires std::is_constructible_v<T, Args...>
-  explicit constexpr LftLog(std::in_place_t, Args &&...args) noexcept(std::is_nothrow_constructible_v<T, Args...>) 
+  explicit constexpr LftLog(std::in_place_t, Args &&...args) noexcept(std::is_nothrow_constructible_v<T, Args...>)
     : t_{ std::forward<Args>(args)... }
   {
-    PrintStrategy::println(
-      "{}(std::in_place_t, Args... args) in place ctor{}", type_to_string(), MemDataFormatter::format(this, k_arg_type_name));
+    PrintStrategy::println("{}(std::in_place_t, Args... args) in place ctor{}",
+      type_to_string(),
+      MemDataFormatter::format(this, k_arg_type_name));
   }
 
   template<class U, class... Args>
-    requires std::is_constructible_v<T, std::initializer_list<U>&, Args...>
+    requires std::is_constructible_v<T, std::initializer_list<U> &, Args...>
   explicit constexpr LftLog(std::in_place_t, std::initializer_list<U> ilist, Args &&...args) noexcept(
-    std::is_nothrow_constructible_v<T, std::initializer_list<U> &, Args...>) 
+    std::is_nothrow_constructible_v<T, std::initializer_list<U> &, Args...>)
     : t_{ ilist, std::forward<Args>(args)... }
   {
     PrintStrategy::println("{}(std::in_place_t, std::initializer_list<U> ilist, Args... args) in place ctor{}",
@@ -112,7 +134,7 @@ struct LftLog
   constexpr ~LftLog() noexcept(std::is_nothrow_destructible_v<T>)
   { PrintStrategy::println("~{}() dtor{}", type_to_string(), MemDataFormatter::format(this, k_arg_type_name)); }
 
-  constexpr LftLog &operator=(const LftLog &rhs) & noexcept(std::is_nothrow_assignable_v<T>)
+  constexpr LftLog &operator=(const LftLog &rhs) & noexcept(std::is_nothrow_copy_assignable_v<T>)
     requires std::is_copy_assignable_v<T>
   {
     t_ = rhs.t_;
@@ -168,7 +190,7 @@ struct LftLog
   T t_;
 
 private:
-  LTU_TYPE_NAME_TO_STRING(LftLog<T>)
+  LTU_TYPE_NAME_TO_STRING_FUNC(LftLog<T>)
 };
 
 template<class PrintStrategy, class MemDataFormatter> struct LftLog<void, PrintStrategy, MemDataFormatter>
@@ -215,7 +237,7 @@ template<class PrintStrategy, class MemDataFormatter> struct LftLog<void, PrintS
   }
 
 private:
-  LTU_TYPE_NAME_TO_STRING(LftLog<void>)
+  LTU_TYPE_NAME_TO_STRING_FUNC(LftLog<void>)
 };
 
 }// namespace ltu

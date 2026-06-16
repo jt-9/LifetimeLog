@@ -9,7 +9,7 @@ function(myproject_setup_dependencies)
   # already been provided to us by a parent project
 
   if(NOT TARGET fmtlib::fmtlib)
-    cpmaddpackage("gh:fmtlib/fmt#12.1.0")
+    cpmaddpackage("gh:fmtlib/fmt#12.2.0")
   endif()
 
   # if(NOT TARGET spdlog::spdlog)
@@ -25,7 +25,7 @@ function(myproject_setup_dependencies)
   # endif()
 
   if(NOT TARGET Catch2::Catch2WithMain)
-    cpmaddpackage("gh:catchorg/Catch2@3.15.0")
+    cpmaddpackage("gh:catchorg/Catch2@3.15.1")
   endif()
 
   if(NOT TARGET CLI11::CLI11)

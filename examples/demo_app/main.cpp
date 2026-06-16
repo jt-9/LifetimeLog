@@ -24,8 +24,9 @@ using LtuPrintStrategy = ltu::FmtPrintStrategy;
 using LtuMemDataFormatter = ltu::MemDataThisThreadIdFmtFormatter<>;
 //*/
 
-
 #include <urc/unique_ptr.hpp>
+
+#include <utility>// std::in_place
 
 // NOLINTNEXTLINE(bugprone-exception-escape)
 int main(/*int argc, char **argv*/) noexcept
@@ -60,8 +61,10 @@ int main(/*int argc, char **argv*/) noexcept
   // Shouldn't compile due to static_assert in template specialisation for void in std::formatter<ltu::LftLog<...>>
   //  std::println("{}", lv1);
 
+  // NOLINTNEXTLINE(cppcoreguidelines-avoid-magic-numbers, readability-magic-numbers, bugprone-unhandled-exception-at-new)
+  const ltu::LftLog<raii::unique_ptr<int>, LtuPrintStrategy, LtuMemDataFormatter> lptr1{ std::in_place, new int(8) };
 
-  ltu::LftLog<raii::unique_ptr<int>, LtuPrintStrategy, LtuMemDataFormatter> lptr1{ std::in_place, new int(8) };
+  const ltu::LftLog<int, LtuPrintStrategy, LtuMemDataFormatter> li3{ ltu::LftLog<short int, LtuPrintStrategy, LtuMemDataFormatter>{ static_cast<short int>(73) } };
 
   return 0;
 }
