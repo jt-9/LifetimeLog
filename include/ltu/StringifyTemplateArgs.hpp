@@ -1,3 +1,6 @@
+#ifndef LTU_STRINGIFY_TEMPLATE_ARGS
+#define LTU_STRINGIFY_TEMPLATE_ARGS
+
 #include <algorithm>
 #include <cstddef>
 #include <ranges>
@@ -86,3 +89,5 @@ template<typename T> [[nodiscard]] constexpr ::std::string_view GetTypeName(void
 }
 
 }// namespace ltu
+
+#endif// LTU_STRINGIFY_TEMPLATE_ARGS

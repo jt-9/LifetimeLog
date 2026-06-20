@@ -3,7 +3,7 @@ include(cmake/CPM.cmake)
 # Done as a function so that updates to variables like
 # CMAKE_CXX_FLAGS don't propagate out to other
 # targets
-function(myproject_setup_dependencies)
+function(ltu_setup_dependencies)
 
   # For each dependency, see if it's
   # already been provided to us by a parent project
@@ -33,7 +33,7 @@ function(myproject_setup_dependencies)
   endif()
 
   if (NOT TARGET urc::urc)
-    cpmaddpackage("gh:jt-9/raii-unique_rc@0.0.2")
+    cpmaddpackage("gh:jt-9/raii-unique_rc@0.0.3")
   endif()
 
 endfunction()

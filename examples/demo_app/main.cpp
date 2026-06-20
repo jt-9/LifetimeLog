@@ -28,9 +28,13 @@ using LtuMemDataFormatter = ltu::MemDataThisThreadIdFmtFormatter<>;
 
 #include <utility>// std::in_place
 
+#include "ltu/CallLog.hpp"
+
 // NOLINTNEXTLINE(bugprone-exception-escape)
 int main(/*int argc, char **argv*/) noexcept
 {
+  const ltu::LOG_FUNC_INOUT(LtuPrintStrategy);  
+
   proj_fmt::println("------------- LifetimeInfo example app -------------");
 
   constexpr auto wrapped_value = 5.8;

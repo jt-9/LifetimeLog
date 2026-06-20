@@ -21,26 +21,26 @@ project(
 include(cmake/PreventInSourceBuilds.cmake)
 include(ProjectOptions.cmake)
 
-myproject_setup_options()
+ltu_setup_options()
 
-myproject_global_options()
+ltu_global_options()
 
 include(Dependencies.cmake)
-myproject_setup_dependencies()
+ltu_setup_dependencies()
 
-myproject_local_options()
+ltu_local_options()
 
-target_compile_features(myproject_options INTERFACE cxx_std_${CMAKE_CXX_STANDARD})
+target_compile_features(ltu_project_options INTERFACE cxx_std_${CMAKE_CXX_STANDARD})
 
-add_library(ltu::project_options ALIAS myproject_options)
-add_library(ltu::project_warnings ALIAS myproject_warnings)
+add_library(ltu::project_options ALIAS ltu_project_options)
+add_library(ltu::project_warnings ALIAS ltu_project_warnings)
 
 #--------------------------------------------------------------------
 # Add subdirectories
 #--------------------------------------------------------------------
 add_subdirectory(src)
 
-if (myproject_BUILD_EXAMPLE)
+if (ltu_BUILD_EXAMPLE)
     add_subdirectory(examples)
 endif()
 
@@ -63,6 +63,6 @@ if(MSVC)
 endif()
 
 # set the startup project for the "play" button in MSVC
-if (myproject_BUILD_EXAMPLE AND MSVC)
+if (ltu_BUILD_EXAMPLE AND MSVC)
   set_property(DIRECTORY PROPERTY VS_STARTUP_PROJECT demo_app)
 endif()

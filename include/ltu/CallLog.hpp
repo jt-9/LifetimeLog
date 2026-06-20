@@ -1,48 +1,46 @@
 #ifndef LTU_CALL_LOGGER
 #define LTU_CALL_LOGGER
 
-
-#include "MemDataThisStdFormatter.hpp"
 #include "StdPrint.hpp"
-#include "StringifyTemplateArgs.hpp"
 
-#include <concepts>
-// #include <stacktrace>
-#include <iostream>
+#include <cstdint>
 #include <source_location>
 #include <string>
-#include <type_traits>
+#include <thread>
 
 namespace ltu {
 
-// Logs to cout, with current indent
-#define LOG(...) std::cout << std::string(ScopedLogger::indent, ' ') << __VA_ARGS__ << std::endl
-
 // Logs in and out of a scope
-struct ScopedLogger
+template<class PrintStrategy> struct ScopedLogger
 {
-  static thread_local int indent;
-  std::string_view m_name;
+  static thread_local std::size_t indent;
+  std::string_view name_;
 
-  explicit constexpr ScopedLogger(std::string_view name) noexcept
-  : m_name{name}
+  explicit constexpr ScopedLogger(std::string_view name, std::uint_least32_t line) noexcept : name_{ name }
   {
-    LOG("\\" << m_name);
+    PrintStrategy::println(
+      "\\{}{}\n\tat line: {}\n\tthread id: {}", std::string(indent, ' '), name_, line, std::this_thread::get_id());
     indent++;
   }
 
   constexpr ~ScopedLogger() noexcept
   {
     indent--;
-    LOG("/" << m_name);
+    PrintStrategy::println("/{}{}\n\tthread id: {}", std::string(indent, ' '), name_, std::this_thread::get_id());
   }
+
+  // ScopedLogger is non-movable, non-copyable
+  ScopedLogger(ScopedLogger &&) = delete;
+  auto operator=(ScopedLogger &&) = delete;
 };
 
-int ScopedLogger::indent = 0;// Should go in cpp file, if we have one
+template<class PrintStrategy>
+thread_local std::size_t ScopedLogger<PrintStrategy>::indent = 0;// Should go in cpp file, if we have one
 
 // Creates a ScopedLogger for the current function
-#define LOGF() \
-  ScopedLogger logger##__LINE__ { std::source_location::current().function_name() }
+#define LOG_FUNC_INOUT(PrintStrat)          \
+  ScopedLogger<PrintStrat> logger##__LINE__ \
+  { std::source_location::current().function_name(), std::source_location::current().line() }
 
 }// namespace ltu
 

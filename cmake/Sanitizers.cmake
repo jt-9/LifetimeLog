@@ -1,5 +1,5 @@
 function(
-  myproject_enable_sanitizers
+  ltu_enable_sanitizers
   project_name
   ENABLE_SANITIZER_ADDRESS
   ENABLE_SANITIZER_LEAK
@@ -78,7 +78,6 @@ function(
           )
         endif()
         target_compile_options(${project_name} INTERFACE /fsanitize=${LIST_OF_SANITIZERS} /Zi /INCREMENTAL:NO)
-        target_compile_definitions(${project_name} INTERFACE _DISABLE_VECTOR_ANNOTATION _DISABLE_STRING_ANNOTATION)
         target_link_options(${project_name} INTERFACE /INCREMENTAL:NO)
       endif()
     endif()
