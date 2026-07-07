@@ -1,11 +1,13 @@
 #ifndef LTU_STD_PRINT_STRATEGY
 #define LTU_STD_PRINT_STRATEGY
 
+#include <version>
+
+#ifdef __cpp_lib_print
 
 #include <print>
 #include <utility>
 
-#ifdef __cpp_lib_print
 
 namespace ltu {
 

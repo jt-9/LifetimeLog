@@ -33,7 +33,7 @@ function(ltu_setup_dependencies)
   endif()
 
   if (NOT TARGET urc::urc)
-    cpmaddpackage("gh:jt-9/raii-unique_rc@0.0.3")
+    cpmaddpackage("gh:jt-9/raii-unique_rc@0.0.6")
   endif()
 
 endfunction()
